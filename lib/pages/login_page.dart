@@ -13,6 +13,20 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   String name = "";
   bool changeButton = false;
+  final _formKey = GlobalKey<FormState>();
+
+  moveToHome(BuildContext context) async {
+    if(_formKey.currentState!.validate()) {
+      setState(() {
+        changeButton = true;
+      });
+      await Future.delayed(Duration(seconds: 1));
+      await Navigator.pushNamed(context, MyRoutes.homeRoute);
+      setState(() {
+        changeButton = false;
+      });
+    }
+  }
   //const LoginPage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -21,9 +35,11 @@ class _LoginPageState extends State<LoginPage> {
       child: SingleChildScrollView(
 
 
-      child: Column(
+      child : Form(
+        key: _formKey,
+          child: Column(
         children: [
-          Image.asset("assets/images/login_page.png",fit: BoxFit.cover,
+          Image.asset("assets/images/login_page2.png",fit: BoxFit.cover,
             height: 350,
           ),
           Text("Welcome $name",style: TextStyle(
@@ -40,8 +56,14 @@ class _LoginPageState extends State<LoginPage> {
               decoration: InputDecoration(
                 hintText: "Enter username",
                 labelText: "Username",
-
               ),
+             validator: (String? value) {
+               if (value!.isEmpty) {
+                 return "Username cann't be empty";
+               }
+
+               return null;
+             },
               onChanged: (value){
                 name = value;
                 setState(() {
@@ -56,19 +78,28 @@ class _LoginPageState extends State<LoginPage> {
                 hintText: "Enter password",
                 labelText: "Password",
               ),
+              validator: (String? value) {
+                  if(value!.isEmpty){
+                    return "Password Cannot be empty";
+                  }
+                  else if (value.length < 6) {
+                  return "Password length should be atleast 6 characters";
+
+                  }
+                  return null;
+                },
+
             ),
             SizedBox(
-              height: 40.0,
+              height: 30.0,
             ),
-            InkWell(
-              onTap:() async {
-                setState(() {
-                  changeButton = true;
-                });
-                await Future.delayed(Duration(seconds: 1));
-               Navigator.pushNamed(context, MyRoutes.homeRoute);
-              },
-              child : AnimatedContainer (
+            Material(
+                color: Colors.deepPurple,
+                borderRadius: BorderRadius.circular(changeButton?50  : 8),
+
+                child: InkWell(
+              onTap:() => moveToHome(context),
+              child : AnimatedContainer(
                 duration: Duration(seconds: 1),
               width: changeButton?50 : 150,
               height: 50,
@@ -79,32 +110,26 @@ class _LoginPageState extends State<LoginPage> {
               )
               : Text("Login",style: TextStyle (color: Colors.white, fontWeight: FontWeight.bold,fontSize: 18),
               ),
-              decoration: BoxDecoration(             //if doing decoration colour should be inside decoration
-                color: Colors.deepPurple,
-               // shape: changeButton?BoxShape.circle.
-                //:BoxShape.rectangle,
-               borderRadius: BorderRadius.circular(changeButton?50  : 8),
-              ),
-            )
-            ),
-            //ElevatedButton(onPressed: () {
 
-            //
-          //  }, child: Text("Login"),
-            //style: TextButton.styleFrom(
-            //minimumSize: Size(150, 40)
-            //),
-           // )
-          ],
 
-          ),
+    ),
+                ),
+
 
          ),
+  ],
+    ),
 
-        ],
-    )
+
+         )
+      ],
+      ),
+         ),
       ),
     );
 
+
   }
 }
+
+
